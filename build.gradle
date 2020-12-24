@@ -1,0 +1,89 @@
+buildscript {
+	ext {
+		springBootVersion = '2.4.0'
+		springDependencyManagementVersion = '1.0.10.RELEASE'
+	}
+}
+
+plugins {
+	id 'org.springframework.boot' version "${springBootVersion}"
+	id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+	id 'java'
+	id 'maven-publish'
+	id 'project-report'
+}
+
+group = 'nl.danman85'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	all {
+		// Exlude this from all libraries, since we're replacing logback with log4j
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+	}
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	// itest sourceSet should inherit all test dependencies
+	itestImplementation.extendsFrom(testImplementation)
+	itestRuntimeOnly.extendsFrom(testRuntimeOnly)
+}
+
+repositories {
+	mavenCentral()
+}
+
+sourceSets {
+	// Custom sourceset for integration tests.
+	itest {
+		compileClasspath += sourceSets.main.output
+		runtimeClasspath += sourceSets.main.output
+		java {
+			srcDir("scr/itest/java")
+		}
+		resources {
+			srcDir("src/itest/resources")
+		}
+	}
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+	implementation 'org.flywaydb:flyway-core'
+	runtimeOnly 'com.h2database:h2'
+
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
+}
+
+// Task to run the integration tests. Because itest isn't a default sourceSet, no build tasks will be provided
+// by Gradle.
+task itest(type: Test) {
+	description = 'Run integration tests'
+	group = 'verification'
+
+	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
+
+	testClassesDirs = sourceSets.itest.output.classesDirs
+	classpath = sourceSets.itest.runtimeClasspath
+
+	mustRunAfter tasks.test
+}
+
+check.dependsOn itest

@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    include:
+  output:
+    ansi:
+      enabled: 'always'
+
+# Actuator settings
+management:
+  endpoints:
+    web:
+      exposure:
+        # If this is not set explicitly, only a handful of 'default' actuator endpoints will be enabled
+        include: '*'

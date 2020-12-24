@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    include: 'h2db'
+  output:
+    ansi:
+      enabled: 'always'

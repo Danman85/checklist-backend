@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{DEFAULT} %c %-5level: %msg%n" disableAnsi="false"/>
+        </Console>
+        <Console name="ColoredConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="%style{%d{DEFAULT}}{yellow} %c %highlight{%-5level: %msg%n}{FATAL=bg_red, ERROR=red, WARN=yellow, DEBUG=green}" disableAnsi="false"/>
+        </Console>
+        <File name="FileAppender" fileName="logs/application.log">
+            <PatternLayout>
+                <Pattern>%d{DEFAULT} %c %-5level: %msg%n</Pattern>
+            </PatternLayout>
+        </File>
+    </Appenders>
+    <Loggers>
+<!--        Logger for my own code-->
+        <Logger name="nl.danman85" level="DEBUG" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="ColoredConsoleAppender"/>
+        </Logger>
+<!--        Logger for everything Spring Boot related-->
+        <Logger name="org.springframework.boot" level="DEBUG" additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+        </Logger>
+        <Root level="ERROR">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
